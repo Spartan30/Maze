@@ -32,6 +32,7 @@ BLUE = (0, 0, 255)
 YELLOW = (255 ,255 ,0)
 BLACK = (0,0,0)
 RED = (255,0,0)
+PURPLE = (255,0,255)
 
 #Create the grid
 def setupGrid(width):
@@ -127,18 +128,24 @@ def findPath(width):
         currNode = None
         checkNode = None
         minF = 99999999999999999
+        minH = 99999999999999999
 
         for n in openSet:
-            if n.f < minF:
+            if n.f == minF:
+                if n.h < minH:
+                    minH = n.h
+                    minF = n.f
+                    currNode = n
+            elif n.f < minF:
                 minF = n.f
                 currNode = n
                 
         openSet.remove(currNode)
         closeSet.append(currNode)
 
-        pygame.draw.rect(screen, BLUE, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+        pygame.draw.rect(screen, PURPLE, (currNode.x+1, currNode.y+1, width-1, width-1),0)
         pygame.display.update()   
-        time.sleep(.05)
+        time.sleep(.02)
 
         if currNode.x == endNode.x and currNode.y == endNode.y:
             print("FOUND: ",endNode.x,endNode.y)
@@ -163,8 +170,16 @@ def findPath(width):
             if checkNode.passable != 0:
                 continue
 
+            pygame.draw.rect(screen, BLUE, (checkNode.x+1, checkNode.y+1, width-1, width-1),0)
+            pygame.display.update()   
+            time.sleep(.05)
+
             checkNode.parent = currNode
             openSet.append(checkNode)
+
+        pygame.draw.rect(screen, YELLOW, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+        pygame.display.update()   
+        time.sleep(.02)
 
     print("No Path Found!")
     for n in closeSet:
