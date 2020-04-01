@@ -31,7 +31,7 @@ GREEN = (0, 255, 0,)
 BLUE = (0, 0, 255)
 YELLOW = (255 ,255 ,0)
 BLACK = (0,0,0)
-
+RED = (255,0,0)
 
 
 def setupGrid(width):
@@ -125,11 +125,18 @@ def findPath(width):
         openSet.remove(currNode)
         closeSet.append(currNode)
 
-        pygame.draw.rect(screen, BLUE, (currNode.x, currNode.y, width, width),0)
+        pygame.draw.rect(screen, BLUE, (currNode.x+1, currNode.y+1, width-1, width-1),0)
         pygame.display.update()   
+        time.sleep(.05)
 
         if currNode.x == endNode.x and currNode.y == endNode.y:
             print("FOUND: ",endNode.x,endNode.y)
+            while currNode is not None:
+                pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+                pygame.display.update()   
+                currNode = currNode.parent
+                time.sleep(.05)
+
             return
             
 
@@ -142,8 +149,17 @@ def findPath(width):
             if checkNode in openSet:
                 continue
             
+            if checkNode.passable != 0:
+                continue
+
+            checkNode.parent = currNode
             openSet.append(checkNode)
-        
+
+    print("No Path Found!")
+    for n in closeSet:
+        pygame.draw.rect(screen, RED, (n.x+1, n.y+1, width-1, width-1),0)
+        pygame.display.update()   
+
 
 #Setup the grid
 setupGrid(width)
@@ -152,23 +168,21 @@ setupGrid(width)
 startNode = createNode(width, width, width)
 startNode.f = 0
 
+#Possible end
 endNode = createNode(screenWidth-width*2, screenHeight-width*2, width)
+
+#Impossible end
+#endNode = createNode(500, 500, width)
 
 #Get all the nodes
 setupNodes(width)
 
-findPath(width)
 
-default_font = pygame.font.get_default_font()
-font_renderer = pygame.font.Font(default_font, 12)
 
-#Display f's
-#for n in nodes:
-#    label = font_renderer.render(str(int(n.f)),1,(0,0,0))
-#    screen.blit(label,(n.x,n.y))
+pygame.draw.rect(screen,GREEN,(0,0,30,20),0)
 
 #Flip the display
-#pygame.display.flip()
+pygame.display.flip()
 
 #Run until the user asks to quit
 running = True
@@ -177,6 +191,37 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                pos = pygame.mouse.get_pos()
+                clickNode = findNode(int(pos[0]/width)*width, int(pos[1]/width)*width)
+                if clickNode is not None:
+                    if clickNode.passable == 0:
+                        clickNode.passable = 1
+                        pygame.draw.rect(screen, BLACK, (clickNode.x+1, clickNode.y+1, width-1, width-1),0)
+                        pygame.display.update()  
+                    else:
+                        clickNode.passable = 0 
+                        pygame.draw.rect(screen, WHITE, (clickNode.x+1, clickNode.y+1, width-1, width-1),0)
+                        pygame.display.update()  
+                
+                else:
+                    if pos[0] > 0 and pos[0] < 30 and pos[1] > 0 and pos[1] < 20:
+                        #Find path
+                        findPath(width)
+
+                        #Font
+                        default_font = pygame.font.get_default_font()
+                        font_renderer = pygame.font.Font(default_font, 12)
+
+                        #Display f's
+                        for n in nodes:
+                            label = font_renderer.render(str(int(n.f)),1,(0,0,0))
+                            screen.blit(label,(n.x,n.y))
+
+                        #Flip the display
+                        pygame.display.flip()
 
 #Done
 pygame.quit()
