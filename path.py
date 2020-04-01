@@ -39,6 +39,9 @@ def setupGrid(width):
     #Fill the background with white
     screen.fill((255,255,255))
 
+    grid.clear()
+    nodes.clear()
+
     for y in range(width, (screenHeight-width), width):
         for x in range(width, (screenWidth-width), width):
             pygame.draw.line(screen, BLACK, [x, y], [x + width, y])           # top of cell
@@ -110,6 +113,10 @@ def findNode(x,y):
 #G cost to start
 #H cost to end
 def findPath(width):
+    openSet.clear()
+    closeSet.clear()
+    visited.clear()
+    stack.clear()
     openSet.append(startNode)
 
     while len(openSet) > 0:
@@ -180,6 +187,7 @@ setupNodes(width)
 
 
 pygame.draw.rect(screen,GREEN,(0,0,30,20),0)
+pygame.draw.rect(screen, RED, (50,0,30,20),0)
 
 #Flip the display
 pygame.display.flip()
@@ -219,6 +227,12 @@ while running:
                         for n in nodes:
                             label = font_renderer.render(str(int(n.f)),1,(0,0,0))
                             screen.blit(label,(n.x,n.y))
+
+                        #Flip the display
+                        pygame.display.flip()
+
+                    elif pos[0] > 50 and pos[0] < 80 and pos[1] > 0 and pos[1] < 20:
+                        print("Restart")
 
                         #Flip the display
                         pygame.display.flip()
