@@ -33,7 +33,7 @@ YELLOW = (255 ,255 ,0)
 BLACK = (0,0,0)
 RED = (255,0,0)
 
-
+#Create the grid
 def setupGrid(width):
 
     #Fill the background with white
@@ -54,6 +54,7 @@ def setupGrid(width):
     #Flip the display
     pygame.display.flip()
 
+#Create a single node
 def createNode(x,y,width):
     newNode = node()
     newNode.x = x
@@ -74,6 +75,7 @@ def createNode(x,y,width):
 
     return newNode
 
+#Create a code and append it to 'nodes'
 def setNode(x,y,width):
     newNode = node()
     newNode.x = x
@@ -99,16 +101,18 @@ def setNode(x,y,width):
 
     nodes.append(newNode)
 
-
+#Setup all nodes
 def setupNodes(width):
     for x,y in grid:
         setNode(x,y,width)
 
+#Find a node in the 'nodes' list
 def findNode(x,y):
     for n in nodes:
         if n.x == x and n.y ==y:
             return n
 
+#Find the back between start and end node
 #F total cost
 #G cost to start
 #H cost to end
@@ -185,8 +189,10 @@ endNode = createNode(screenWidth-width*2, screenHeight-width*2, width)
 setupNodes(width)
 
 
-
+#Draw start button
 pygame.draw.rect(screen,GREEN,(0,0,30,20),0)
+
+#Draw end button
 pygame.draw.rect(screen, RED, (50,0,30,20),0)
 
 #Flip the display
@@ -197,25 +203,38 @@ running = True
 while running:
     #Did the user click the window close button?
     for event in pygame.event.get():
+        #Check event type
         if event.type == pygame.QUIT:
+            #Quit game
             running = False
         
+        #Mouse click
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
+                #Left click, get position
                 pos = pygame.mouse.get_pos()
+
+                #Find node that was clicked on
                 clickNode = findNode(int(pos[0]/width)*width, int(pos[1]/width)*width)
+
+                #Check if a node was clicked
                 if clickNode is not None:
+                    #Node was clicked
                     if clickNode.passable == 0:
+                        #Node is passable, set to not passable
                         clickNode.passable = 1
                         pygame.draw.rect(screen, BLACK, (clickNode.x+1, clickNode.y+1, width-1, width-1),0)
                         pygame.display.update()  
                     else:
+                        #Not is not passable, set to passable
                         clickNode.passable = 0 
                         pygame.draw.rect(screen, WHITE, (clickNode.x+1, clickNode.y+1, width-1, width-1),0)
                         pygame.display.update()  
                 
                 else:
+                    #Node was not clicked
                     if pos[0] > 0 and pos[0] < 30 and pos[1] > 0 and pos[1] < 20:
+                        #Start button was clicked
                         #Find path
                         findPath(width)
 
@@ -232,7 +251,22 @@ while running:
                         pygame.display.flip()
 
                     elif pos[0] > 50 and pos[0] < 80 and pos[1] > 0 and pos[1] < 20:
+                        #Restart button was clicked
                         print("Restart")
+
+                        #Setup the grid
+                        setupGrid(width)
+
+                        #Get all the nodes
+                        setupNodes(width)
+
+
+                        #Draw start button
+                        pygame.draw.rect(screen,GREEN,(0,0,30,20),0)
+
+                        #Draw end button
+                        pygame.draw.rect(screen, RED, (50,0,30,20),0)
+
 
                         #Flip the display
                         pygame.display.flip()
