@@ -55,7 +55,7 @@ def setupGrid(width):
     #Flip the display
     pygame.display.flip()
 
-#Create a single node
+#Create a start and end node
 def createNode(x,y,width):
     newNode = node()
     newNode.x = x
@@ -83,10 +83,10 @@ def setNode(x,y,width):
     newNode.y = y
     newNode.neighbours = []
     
-    newNode.g = math.sqrt((x-startNode.x)**2 + (y-startNode.y)**2)
-    newNode.h = math.sqrt((x-endNode.x)**2 + (y-endNode.y)**2)
+    newNode.g = int(abs(x-startNode.x)/width) + int(abs(y-startNode.y)/width)
+    newNode.h = int(abs(x-endNode.x)/width)**2 + int(abs(y-endNode.y)/width)**2
 
-    newNode.f = newNode.g + newNode.h
+    newNode.f = int(newNode.g + newNode.h)
 
     if (x+width, y) in grid: #Check Right
         newNode.neighbours.append((x+width,y))
@@ -122,7 +122,7 @@ def findPath(width):
     closeSet.clear()
     visited.clear()
     stack.clear()
-    openSet.append(startNode)
+    openSet.append(findNode(width,width))
 
     while len(openSet) > 0:
         currNode = None
@@ -138,6 +138,7 @@ def findPath(width):
                     currNode = n
             elif n.f < minF:
                 minF = n.f
+                minH = n.h
                 currNode = n
                 
         openSet.remove(currNode)
@@ -163,12 +164,26 @@ def findPath(width):
 
             if checkNode in closeSet:
                 continue
-
-            if checkNode in openSet:
-                continue
             
             if checkNode.passable != 0:
                 continue
+
+
+            if checkNode in openSet:
+                #checkNode is alread in openSet
+                #Check if the new g value for checkNode will be higher than its current g value
+                if (currNode.g + 1) > checkNode.g:
+                    #New g value is higher than current g value, keep current value
+                    continue
+                else:
+                    #Check node is in openSet and new g value is less then or equal to current g value
+                    #Update g and f value
+                    checkNode.g = currNode.g + 1
+                    checkNode.f = checkNode.g + checkNode.h
+                    continue
+
+            checkNode.g = currNode.g + 1
+            checkNode.f = checkNode.g + checkNode.h
 
             pygame.draw.rect(screen, BLUE, (checkNode.x+1, checkNode.y+1, width-1, width-1),0)
             pygame.display.update()   
@@ -193,9 +208,12 @@ setupGrid(width)
 #Get start and end nodes
 startNode = createNode(width, width, width)
 startNode.f = 0
+startNode.g = 0
 
 #Possible end
 endNode = createNode(screenWidth-width*2, screenHeight-width*2, width)
+endNode.f = 0
+endNode.h = 0
 
 #Impossible end
 #endNode = createNode(500, 500, width)
@@ -261,6 +279,8 @@ while running:
                         for n in nodes:
                             label = font_renderer.render(str(int(n.f)),1,(0,0,0))
                             screen.blit(label,(n.x,n.y))
+                            label = font_renderer.render(str(int(n.g)),1,(0,0,0))
+                            screen.blit(label,(n.x,n.y+13))
 
                         #Flip the display
                         pygame.display.flip()
