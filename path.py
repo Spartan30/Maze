@@ -151,35 +151,9 @@ def findPath(width):
         if currNode.x == endNode.x and currNode.y == endNode.y:
             print("FOUND: ",endNode.x,endNode.y)
             path = []
-            while currNode is not findNode(width,width):
-                prevNode = None
-                minG = 99999999999
-                maxF = 0
+            while currNode is not None:
                 path.append(currNode)
-                for x,y in currNode.neighbours:
-                    n = findNode(x,y)
-                    if n in closeSet or n in openSet:
-                        if n.g < minG:
-                            minG = n.g
-                            maxF = n.f
-                            prevNode = n
-                        elif n.g == minG:
-                            if n.f > minF:
-                                maxF = n.f
-                                minG = n.g
-                                prevNode = n
-
-            #while currNode is not None:
-                path.append(prevNode)
-                #pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
-                #pygame.display.update()   
-                currNode = prevNode
-                #currNode = currNode.parent
-                #time.sleep(.05)
-            path.append(currNode)
-            #pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
-            #pygame.display.update()   
-            #time.sleep(.05)
+                currNode = currNode.parent
 
             return path[::-1]
             
@@ -188,6 +162,13 @@ def findPath(width):
             checkNode = findNode(x,y)
 
             if checkNode in closeSet:
+                #Node is already in closed set
+                #Check if path from start through currNode is shorter than through the closedNode's parent
+                if(currNode.g+1) < checkNode.g:
+                    #Path is shorter, change parent to currNode and update g and f
+                    checkNode.parent = currNode
+                    checkNode.g = currNode.g+1
+                    checkNode.f = checkNode.g + checkNode.h
                 continue
             
             if checkNode.passable != 0:
@@ -195,7 +176,7 @@ def findPath(width):
 
 
             if checkNode in openSet:
-                #checkNode is alread in openSet
+                #checkNode is already in openSet
                 #Check if the new g value for checkNode will be higher than its current g value
                 if (currNode.g + 1) > checkNode.g:
                     #New g value is higher than current g value, keep current value
@@ -205,6 +186,7 @@ def findPath(width):
                     #Update g and f value
                     checkNode.g = currNode.g + 1
                     checkNode.f = checkNode.g + checkNode.h
+                    checkNode.parent = currNode
                     continue
 
             checkNode.g = currNode.g + 1
