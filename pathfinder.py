@@ -4,6 +4,8 @@ pygame.init()
 
 import time
 import random
+import math
+from node import node
 
 screenWidth = 400
 screenHeight = 400
@@ -81,20 +83,17 @@ def setupGrid(width):
     #Flip the display
     pygame.display.flip()
 
-
+#Create the Maze
 def createMaze(x,y):
-    
-    stack.clear()
-    visited.clear()
-
-
     stack.append((x,y))
     visited.append((x,y))
     single_cell(x,y)
 
     while len(stack) > 0:
-        time.sleep(.05)
+        time.sleep(.02)
         cell = []
+
+        currNode = findNode(x,y)
 
         #Search for unvisited neighbours
         if (x+width, y) not in visited and (x+width, y) in grid: #Check cell to right
@@ -120,6 +119,8 @@ def createMaze(x,y):
 
                 x = x + width
 
+                currNode.neighbours.append((x,y))
+
                 visited.append((x,y))
                 stack.append((x,y))
             
@@ -128,6 +129,8 @@ def createMaze(x,y):
                 solution[(x, y+width)] = x,y
 
                 y = y + width
+
+                currNode.neighbours.append((x,y))
 
                 visited.append((x,y))
                 stack.append((x,y))
@@ -138,6 +141,8 @@ def createMaze(x,y):
 
                 x = x - width
 
+                currNode.neighbours.append((x,y))
+
                 visited.append((x,y))
                 stack.append((x,y))
 
@@ -146,6 +151,8 @@ def createMaze(x,y):
                 solution[(x,y-width)] = x,y
 
                 y = y - width
+
+                currNode.neighbours.append((x,y))
 
                 visited.append((x,y))
                 stack.append((x,y))
@@ -156,6 +163,7 @@ def createMaze(x,y):
             time.sleep(.02)                                       # slow program down a bit
             backtracking_cell(x, y)                               # change colour to green to identify backtracking path
 
+#Obsolete
 def plot_route_back(x,y):
     solution_cell(x, y)                                          # solution list contains all the coordinates to route back to start
     while (x, y) != (width,width):                                     # loop until cell position == start position
@@ -163,9 +171,72 @@ def plot_route_back(x,y):
         solution_cell(x, y)                                      # animate route back
         time.sleep(.1)
 
+#Create a start or end node
+def createNode(x,y,width):
+    newNode = node()
+    newNode.x = x
+    newNode.y = y
+    newNode.neighbours = []
 
+    return newNode
+
+#Create a code and append it to 'nodes'
+def setNode(x,y,width):
+    newNode = node()
+    newNode.x = x
+    newNode.y = y
+    newNode.neighbours = []
+    
+    #Calculate g and h
+    newNode.g = int(abs(x-startNode.x)/width) + int(abs(y-startNode.y)/width)
+    newNode.h = int(abs(x-endNode.x)/width)**2 + int(abs(y-endNode.y)/width)**2
+
+    #Calculate f
+    newNode.f = int(newNode.g + newNode.h)
+
+    nodes.append(newNode)
+
+#Setup all nodes
+def setupNodes(width):
+    nodes.clear()
+    for x,y in grid:
+        setNode(x,y,width)
+
+#Find a node in the 'nodes' list
+def findNode(x,y):
+    for n in nodes:
+        if n.x == x and n.y ==y:
+            return n
+    return None
+
+
+#Setup grid
 setupGrid(width)
+
+#Set default start node
+startNode = createNode(width, width, width)
+startNode.f = 0
+startNode.g = 0
+
+#Set default end node
+endNode = createNode(screenWidth-width*2, screenHeight-width*2, width)
+endNode.f = 0
+endNode.h = 0
+
+#Get all the nodes
+setupNodes(width)
+
+#Create maze
 createMaze(width,width)
+
+print("PAINT")
+
+#Show start and end nodes
+pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)   
+pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
+
+pygame.display.flip()
+
 #plot_route_back(screenWidth-width*2, screenHeight-width*2)
 
 #Run until the user asks to quit

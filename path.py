@@ -119,7 +119,7 @@ def findNode(x,y):
         if n.x == x and n.y ==y:
             return n
 
-#Find the back between start and end node
+#Find the path between start and end node
 #F total cost
 #G cost to start
 #H cost to end
