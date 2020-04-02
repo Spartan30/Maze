@@ -7,8 +7,8 @@ import random
 import math
 from node import node
 
-screenWidth = 400
-screenHeight = 400
+screenWidth = 600
+screenHeight = 600
 
 #Set up drawing window
 screen = pygame.display.set_mode([screenWidth, screenHeight])
@@ -330,8 +330,8 @@ while running:
                         for n in nodes:
                             label = font_renderer.render(str(int(n.f)),1,(0,0,0))
                             screen.blit(label,(n.x,n.y))
-                            label = font_renderer.render(str(int(n.g)),1,(0,0,0))
-                            screen.blit(label,(n.x,n.y+13))
+                            #label = font_renderer.render(str(int(n.g)),1,(0,0,0))
+                            #screen.blit(label,(n.x,n.y+13))
 
                         #Flip the display
                         pygame.display.flip()
