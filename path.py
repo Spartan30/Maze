@@ -273,7 +273,7 @@ setupNodes(width)
 #Draw start button
 pygame.draw.rect(screen,GREEN,(0,0,30,20),0)
 
-#Draw end button
+#Draw restart button
 pygame.draw.rect(screen, RED, (50,0,30,20),0)
 
 #Flip the display

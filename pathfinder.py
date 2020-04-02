@@ -222,6 +222,137 @@ def findNode(x,y):
             return n
     return None
 
+#Find the path between start and end node
+#F total cost
+#G cost to start
+#H cost to end
+def findPath(x,y,width):
+
+    #Clear lists
+    openSet.clear()
+    closeSet.clear()
+    visited.clear()
+    stack.clear()
+
+    #Add start node to openSet
+    openSet.append(findNode(x,y))
+
+    #While openSet is not empty
+    while len(openSet) > 0:
+        currNode = None
+        checkNode = None
+        minF = 99999999999999999
+        minH = 99999999999999999
+        minG = 99999999999999999
+
+        #Find best node in openSet
+        for n in openSet:
+            #Check status of node's f vs minF
+            if n.f == minF:
+                #Node's f is equal to minF, use H as tie breaker
+                if n.h < minH:
+                    minH = n.h
+                    minF = n.f
+                    minG = n.g
+                    currNode = n
+
+            elif n.f < minF:
+                #Node's f is less than minF
+                minF = n.f
+                minH = n.h
+                minG = n.g
+                currNode = n
+                
+        #Remove current node from openSet and add to closeSet
+        openSet.remove(currNode)
+        closeSet.append(currNode)
+
+        #Draw current square being checked
+        pygame.draw.rect(screen, PURPLE, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+        pygame.display.update()   
+        time.sleep(.02)
+
+        #Check if end has been reached
+        if currNode.x == endNode.x and currNode.y == endNode.y:
+            #Found end
+            print("FOUND: ",endNode.x,endNode.y)
+            path = []
+
+            #Keep looping until start is reached
+            while currNode is not None:
+                #Add node to path
+                path.append(currNode)
+
+                #Set node to be parent node
+                currNode = currNode.parent
+
+            #Return the path in reverse
+            return path[::-1]
+            
+
+        for x,y in currNode.neighbours:
+            #Get neighbour node
+            checkNode = findNode(x,y)
+
+            if checkNode in closeSet:
+                #Node is already in closed set
+                #Check if path from start through currNode is shorter than through the closedNode's parent
+                if(currNode.g+1) < checkNode.g:
+                    #Path is shorter, change parent to currNode and update g and f
+                    checkNode.parent = currNode
+                    checkNode.g = currNode.g+1
+                    checkNode.f = checkNode.g + checkNode.h 
+                continue
+            
+            #Check if node is passable
+            if checkNode.passable != 0:
+                #Node is not passable
+                continue
+
+
+            if checkNode in openSet:
+                #checkNode is already in openSet
+                #Check if the new g value for checkNode will be higher than its current g value
+                if (currNode.g + 1) > checkNode.g:
+                    #New g value is higher than current g value, keep current value
+                    continue
+                else:
+                    #Check node is in openSet and new g value is less then or equal to current g value
+                    #Update g and f value
+                    checkNode.g = currNode.g + 1
+                    checkNode.f = checkNode.g + checkNode.h
+                    checkNode.parent = currNode
+                    continue
+
+            #Node is not in openSet or closeSet, update g and f
+            checkNode.g = currNode.g + 1
+            checkNode.f = checkNode.g + checkNode.h
+
+            #Draw openSet square
+            pygame.draw.rect(screen, BLUE, (checkNode.x+1, checkNode.y+1, width-1, width-1),0)
+            pygame.display.update()   
+            time.sleep(.02)
+
+            #Set nodes parent and add to openSet
+            checkNode.parent = currNode
+            openSet.append(checkNode)
+
+        #Draw closeSet square
+        pygame.draw.rect(screen, YELLOW, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+        pygame.display.update()   
+        time.sleep(.02)
+
+    #No path found
+    print("No Path Found!")
+
+    #Set all closeSet square to red
+    for n in closeSet:
+        pygame.draw.rect(screen, RED, (n.x+1, n.y+1, width-1, width-1),0)
+        pygame.display.update()   
+
+    #Return None
+    return None
+
 
 #Setup grid
 setupGrid(width)
@@ -247,6 +378,12 @@ createMaze(width,width)
 pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)   
 pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
 
+#Draw start button
+pygame.draw.rect(screen,GREEN,(0,0,30,20),0)
+
+#Draw restart button
+pygame.draw.rect(screen, RED, (50,0,30,20),0)
+
 pygame.display.flip()
 
 #plot_route_back(screenWidth-width*2, screenHeight-width*2)
@@ -258,6 +395,69 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        #Mouse click
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                #Left click, get position
+                pos = pygame.mouse.get_pos()
+
+                    #Node was not clicked
+                if pos[0] > 0 and pos[0] < 30 and pos[1] > 0 and pos[1] < 20:
+                    #Start button was clicked
+                    #Find path
+                    path = findPath(startNode.x, startNode.y, width)
+
+                    if path is not None:
+
+                        #Draw path starting at beginning
+                        for p in path:
+                            pygame.draw.rect(screen, GREEN, (p.x+1, p.y+1, width-1, width-1),0)
+                            pygame.display.update()   
+                            time.sleep(.01)
+
+                    #Font
+                    default_font = pygame.font.get_default_font()
+                    font_renderer = pygame.font.Font(default_font, 12)
+
+                    #Display f's
+                    #for n in nodes:
+                        #label = font_renderer.render(str(int(n.f)),1,(0,0,0))
+                        #screen.blit(label,(n.x,n.y))
+                        #label = font_renderer.render(str(int(n.g)),1,(0,0,0))
+                        #screen.blit(label,(n.x,n.y+13))
+
+                    #Flip the display
+                    pygame.display.flip()
+
+                elif pos[0] > 50 and pos[0] < 80 and pos[1] > 0 and pos[1] < 20:
+                    #Restart button was clicked
+                    print("Restart")
+
+                    #Setup the grid
+                    setupGrid(width)
+
+                    #Get all the nodes
+                    setupNodes(width)
+
+                    #Creat Maze
+                    createMaze(width,width)
+
+                    pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)
+
+                    pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
+
+
+                    #Draw start button
+                    pygame.draw.rect(screen,GREEN,(0,0,30,20),0)
+
+                    #Draw end button
+                    pygame.draw.rect(screen, RED, (50,0,30,20),0)
+
+
+                    #Flip the display
+                    pygame.display.flip()
+
 
 #Done
 pygame.quit()
