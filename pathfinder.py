@@ -7,8 +7,8 @@ import random
 import math
 from node import node
 
-screenWidth = 400
-screenHeight = 400
+screenWidth = 600
+screenHeight = 600
 
 #Set up drawing window
 screen = pygame.display.set_mode([screenWidth, screenHeight])
