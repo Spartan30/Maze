@@ -7,12 +7,14 @@ import random
 import math
 from node import node
 
+#Screen size
 screenWidth = 600
 screenHeight = 600
 
 #Set up drawing window
 screen = pygame.display.set_mode([screenWidth, screenHeight])
 
+#Variables
 width = 25
 lineWidth = 0
 colour = 0
@@ -55,7 +57,7 @@ def setupGrid(width):
     #Flip the display
     pygame.display.flip()
 
-#Create a start and end node
+#Create a start or end node
 def createNode(x,y,width):
     newNode = node()
     newNode.x = x
@@ -83,11 +85,14 @@ def setNode(x,y,width):
     newNode.y = y
     newNode.neighbours = []
     
+    #Calculate g and h
     newNode.g = int(abs(x-startNode.x)/width) + int(abs(y-startNode.y)/width)
     newNode.h = int(abs(x-endNode.x)/width)**2 + int(abs(y-endNode.y)/width)**2
 
+    #Calculate f
     newNode.f = int(newNode.g + newNode.h)
 
+    #Find neighbours
     if (x+width, y) in grid: #Check Right
         newNode.neighbours.append((x+width,y))
 
@@ -104,6 +109,7 @@ def setNode(x,y,width):
 
 #Setup all nodes
 def setupNodes(width):
+    nodes.clear()
     for x,y in grid:
         setNode(x,y,width)
 
@@ -117,7 +123,7 @@ def findNode(x,y):
 #F total cost
 #G cost to start
 #H cost to end
-def findPath(width):
+def findPath(x,y,width):
 
     #Clear lists
     openSet.clear()
@@ -126,7 +132,7 @@ def findPath(width):
     stack.clear()
 
     #Add start node to openSet
-    openSet.append(findNode(width,width))
+    openSet.append(findNode(x,y))
 
     #While openSet is not empty
     while len(openSet) > 0:
@@ -248,22 +254,21 @@ def findPath(width):
 #Setup the grid
 setupGrid(width)
 
-#Get start and end nodes
+#Set default start node
 startNode = createNode(width, width, width)
 startNode.f = 0
 startNode.g = 0
+pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)   
 
-#Possible end
+#Set default end node
 endNode = createNode(screenWidth-width*2, screenHeight-width*2, width)
 endNode.f = 0
 endNode.h = 0
+pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
 
-#Impossible end
-#endNode = createNode(500, 500, width)
 
 #Get all the nodes
 setupNodes(width)
-
 
 #Draw start button
 pygame.draw.rect(screen,GREEN,(0,0,30,20),0)
@@ -284,6 +289,55 @@ while running:
             #Quit game
             running = False
         
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_s:
+                #S key was pressed
+                #Get position of mouse
+                pos = pygame.mouse.get_pos()
+
+                #Find node that was clicked on
+                clickNode = findNode(int(pos[0]/width)*width, int(pos[1]/width)*width)
+
+                #Check if a node was clicked
+                if clickNode is not None:
+
+                    #Remove old start node
+                    pygame.draw.rect(screen, WHITE, (startNode.x+1, startNode.y+1, width-1, width-1),0)
+
+                    #Set start node
+                    startNode = createNode(clickNode.x, clickNode.y, width)
+                    startNode.f = 0
+                    startNode.g = 0
+                    pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)   
+                    pygame.display.flip()
+
+                    #Reset nodes
+                    setupNodes(width)
+
+            elif event.key == pygame.K_e:
+                #E key was pressed
+                #Get position of mouse
+                pos = pygame.mouse.get_pos()
+
+                #Find node that was clicked on
+                clickNode = findNode(int(pos[0]/width)*width, int(pos[1]/width)*width)
+
+                #Check if a node was clicked
+                if clickNode is not None:
+
+                    #Remove old end node
+                    pygame.draw.rect(screen, WHITE, (endNode.x+1, endNode.y+1, width-1, width-1),0)
+
+                    #Create new end node
+                    endNode = createNode(clickNode.x, clickNode.y, width)
+                    endNode.f = 0
+                    endNode.h = 0
+                    pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
+                    pygame.display.flip()
+
+                    #Reset nodes
+                    setupNodes(width)
+
         #Mouse click
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
@@ -312,7 +366,7 @@ while running:
                     if pos[0] > 0 and pos[0] < 30 and pos[1] > 0 and pos[1] < 20:
                         #Start button was clicked
                         #Find path
-                        path = findPath(width)
+                        path = findPath(startNode.x, startNode.y, width)
 
                         if path is not None:
 
@@ -345,6 +399,10 @@ while running:
 
                         #Get all the nodes
                         setupNodes(width)
+
+                        pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)
+
+                        pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
 
 
                         #Draw start button
