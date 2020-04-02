@@ -17,6 +17,9 @@ colour = 0
 xTiles = int(screenWidth/width)
 yTiles = int(screenHeight/width)
 grid = []
+nodes = []
+openSet = []
+closeSet = []
 stack = []
 visited = []
 solution = {}
@@ -27,32 +30,34 @@ GREEN = (0, 255, 0,)
 BLUE = (0, 0, 255)
 YELLOW = (255 ,255 ,0)
 BLACK = (0,0,0)
+RED = (255,0,0)
+PURPLE = (255,0,255)
 
 def push_up(x, y):
-    pygame.draw.rect(screen, BLUE, (x + 1, y - width + 1, width-1, width*2-1), 0)         # draw a rectangle twice the width of the cell
+    pygame.draw.rect(screen, WHITE, (x + 1, y - width + 1, width-1, width*2-1), 0)         # draw a rectangle twice the width of the cell
     pygame.display.update()                                              # to animate the wall being removed
 
 
 def push_down(x, y):
-    pygame.draw.rect(screen, BLUE, (x +  1, y + 1, width-1, width*2-1), 0)
+    pygame.draw.rect(screen, WHITE, (x +  1, y + 1, width-1, width*2-1), 0)
     pygame.display.update()
 
 
 def push_left(x, y):
-    pygame.draw.rect(screen, BLUE, (x - width +1, y +1, width*2-1, width-1), 0)
+    pygame.draw.rect(screen, WHITE, (x - width +1, y +1, width*2-1, width-1), 0)
     pygame.display.update()
 
 
 def push_right(x, y):
-    pygame.draw.rect(screen, BLUE, (x +1, y +1, width*2-1, width-1), 0)
+    pygame.draw.rect(screen, WHITE, (x +1, y +1, width*2-1, width-1), 0)
     pygame.display.update()
 
 def single_cell( x, y):
-    pygame.draw.rect(screen, GREEN, (x +1, y +1, width - 2, width - 2), 0)          # draw a single width cell
+    pygame.draw.rect(screen, GREEN, (x +1, y +1, width - 1, width - 1), 0)          # draw a single width cell
     pygame.display.update()
 
 def backtracking_cell(x, y):
-    pygame.draw.rect(screen, BLUE, (x +1, y +1, width - 2, width - 2), 0)        # used to re-colour the path after single_cell
+    pygame.draw.rect(screen, WHITE, (x +1, y +1, width - 1, width - 1), 0)        # used to re-colour the path after single_cell
     pygame.display.update()                                        # has visited cell
 
 def solution_cell(x,y):
@@ -78,6 +83,11 @@ def setupGrid(width):
 
 
 def createMaze(x,y):
+    
+    stack.clear()
+    visited.clear()
+
+
     stack.append((x,y))
     visited.append((x,y))
     single_cell(x,y)
@@ -143,7 +153,7 @@ def createMaze(x,y):
         else:
             x, y = stack.pop()                                    # if no cells are available pop one from the stack
             single_cell(x, y)                                     # use single_cell function to show backtracking image
-            time.sleep(.05)                                       # slow program down a bit
+            time.sleep(.02)                                       # slow program down a bit
             backtracking_cell(x, y)                               # change colour to green to identify backtracking path
 
 def plot_route_back(x,y):
@@ -156,7 +166,7 @@ def plot_route_back(x,y):
 
 setupGrid(width)
 createMaze(width,width)
-plot_route_back(screenWidth-width*2, screenHeight-width*2)
+#plot_route_back(screenWidth-width*2, screenHeight-width*2)
 
 #Run until the user asks to quit
 running = True
