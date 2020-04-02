@@ -151,14 +151,20 @@ def findPath(width):
         if currNode.x == endNode.x and currNode.y == endNode.y:
             print("FOUND: ",endNode.x,endNode.y)
             path = []
+            #Keep looping until start is reached
             while currNode is not None:
+                #Add node to path
                 path.append(currNode)
+
+                #Set node to be parent node
                 currNode = currNode.parent
 
+            #Return the path in reverse
             return path[::-1]
             
 
         for x,y in currNode.neighbours:
+            #Get neighbour node
             checkNode = findNode(x,y)
 
             if checkNode in closeSet:
