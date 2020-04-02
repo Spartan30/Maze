@@ -118,39 +118,57 @@ def findNode(x,y):
 #G cost to start
 #H cost to end
 def findPath(width):
+
+    #Clear lists
     openSet.clear()
     closeSet.clear()
     visited.clear()
     stack.clear()
+
+    #Add start node to openSet
     openSet.append(findNode(width,width))
 
+    #While openSet is not empty
     while len(openSet) > 0:
         currNode = None
         checkNode = None
         minF = 99999999999999999
         minH = 99999999999999999
+        minG = 99999999999999999
 
+        #Find best node in openSet
         for n in openSet:
+            #Check status of node's f vs minF
             if n.f == minF:
+                #Node's f is equal to minF, use H as tie breaker
                 if n.h < minH:
                     minH = n.h
                     minF = n.f
+                    minG = n.g
                     currNode = n
+
             elif n.f < minF:
+                #Node's f is less than minF
                 minF = n.f
                 minH = n.h
+                minG = n.g
                 currNode = n
                 
+        #Remove current node from openSet and add to closeSet
         openSet.remove(currNode)
         closeSet.append(currNode)
 
+        #Draw current square being checked
         pygame.draw.rect(screen, PURPLE, (currNode.x+1, currNode.y+1, width-1, width-1),0)
         pygame.display.update()   
         time.sleep(.02)
 
+        #Check if end has been reached
         if currNode.x == endNode.x and currNode.y == endNode.y:
+            #Found end
             print("FOUND: ",endNode.x,endNode.y)
             path = []
+
             #Keep looping until start is reached
             while currNode is not None:
                 #Add node to path
@@ -177,7 +195,9 @@ def findPath(width):
                     checkNode.f = checkNode.g + checkNode.h 
                 continue
             
+            #Check if node is passable
             if checkNode.passable != 0:
+                #Node is not passable
                 continue
 
 
@@ -195,25 +215,33 @@ def findPath(width):
                     checkNode.parent = currNode
                     continue
 
+            #Node is not in openSet or closeSet, update g and f
             checkNode.g = currNode.g + 1
             checkNode.f = checkNode.g + checkNode.h
 
+            #Draw openSet square
             pygame.draw.rect(screen, BLUE, (checkNode.x+1, checkNode.y+1, width-1, width-1),0)
             pygame.display.update()   
-            time.sleep(.05)
+            time.sleep(.02)
 
+            #Set nodes parent and add to openSet
             checkNode.parent = currNode
             openSet.append(checkNode)
 
+        #Draw closeSet square
         pygame.draw.rect(screen, YELLOW, (currNode.x+1, currNode.y+1, width-1, width-1),0)
         pygame.display.update()   
         time.sleep(.02)
 
+    #No path found
     print("No Path Found!")
+
+    #Set all closeSet square to red
     for n in closeSet:
         pygame.draw.rect(screen, RED, (n.x+1, n.y+1, width-1, width-1),0)
         pygame.display.update()   
 
+    #Return None
     return None
 
 
