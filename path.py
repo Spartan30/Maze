@@ -174,7 +174,7 @@ def findPath(width):
                     #Path is shorter, change parent to currNode and update g and f
                     checkNode.parent = currNode
                     checkNode.g = currNode.g+1
-                    checkNode.f = checkNode.g + checkNode.h
+                    checkNode.f = checkNode.g + checkNode.h 
                 continue
             
             if checkNode.passable != 0:
