@@ -150,34 +150,38 @@ def findPath(width):
 
         if currNode.x == endNode.x and currNode.y == endNode.y:
             print("FOUND: ",endNode.x,endNode.y)
+            path = []
             while currNode is not findNode(width,width):
                 prevNode = None
                 minG = 99999999999
-                minF = 99999999999
+                maxF = 0
+                path.append(currNode)
                 for x,y in currNode.neighbours:
                     n = findNode(x,y)
                     if n in closeSet or n in openSet:
                         if n.g < minG:
                             minG = n.g
-                            minF = n.f
+                            maxF = n.f
                             prevNode = n
                         elif n.g == minG:
-                            if n.f < minF:
-                                minF = n.f
+                            if n.f > minF:
+                                maxF = n.f
                                 minG = n.g
                                 prevNode = n
 
             #while currNode is not None:
-                pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
-                pygame.display.update()   
+                path.append(prevNode)
+                #pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+                #pygame.display.update()   
                 currNode = prevNode
-            #    currNode = currNode.parent
-                time.sleep(.05)
-            pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
-            pygame.display.update()   
-            time.sleep(.05)
+                #currNode = currNode.parent
+                #time.sleep(.05)
+            path.append(currNode)
+            #pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+            #pygame.display.update()   
+            #time.sleep(.05)
 
-            return
+            return path[::-1]
             
 
         for x,y in currNode.neighbours:
@@ -221,6 +225,8 @@ def findPath(width):
     for n in closeSet:
         pygame.draw.rect(screen, RED, (n.x+1, n.y+1, width-1, width-1),0)
         pygame.display.update()   
+
+    return None
 
 
 #Setup the grid
@@ -290,7 +296,15 @@ while running:
                     if pos[0] > 0 and pos[0] < 30 and pos[1] > 0 and pos[1] < 20:
                         #Start button was clicked
                         #Find path
-                        findPath(width)
+                        path = findPath(width)
+
+                        if path is not None:
+
+                            #Draw path starting at beginning
+                            for p in path:
+                                pygame.draw.rect(screen, GREEN, (p.x+1, p.y+1, width-1, width-1),0)
+                                pygame.display.update()   
+                                time.sleep(.01)
 
                         #Font
                         default_font = pygame.font.get_default_font()
