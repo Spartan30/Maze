@@ -93,6 +93,7 @@ def createMaze(x,y):
         time.sleep(.02)
         cell = []
 
+        neighbourNode = None
         currNode = findNode(x,y)
 
         #Search for unvisited neighbours
@@ -121,6 +122,9 @@ def createMaze(x,y):
 
                 currNode.neighbours.append((x,y))
 
+                neighbourNode = findNode(x,y)
+                neighbourNode.neighbours.append((currNode.x, currNode.y))
+
                 visited.append((x,y))
                 stack.append((x,y))
             
@@ -131,6 +135,9 @@ def createMaze(x,y):
                 y = y + width
 
                 currNode.neighbours.append((x,y))
+
+                neighbourNode = findNode(x,y)
+                neighbourNode.neighbours.append((currNode.x, currNode.y))
 
                 visited.append((x,y))
                 stack.append((x,y))
@@ -143,6 +150,9 @@ def createMaze(x,y):
 
                 currNode.neighbours.append((x,y))
 
+                neighbourNode = findNode(x,y)
+                neighbourNode.neighbours.append((currNode.x, currNode.y))
+
                 visited.append((x,y))
                 stack.append((x,y))
 
@@ -153,6 +163,9 @@ def createMaze(x,y):
                 y = y - width
 
                 currNode.neighbours.append((x,y))
+
+                neighbourNode = findNode(x,y)
+                neighbourNode.neighbours.append((currNode.x, currNode.y))
 
                 visited.append((x,y))
                 stack.append((x,y))
@@ -229,7 +242,6 @@ setupNodes(width)
 #Create maze
 createMaze(width,width)
 
-print("PAINT")
 
 #Show start and end nodes
 pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)   
