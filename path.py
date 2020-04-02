@@ -150,11 +150,32 @@ def findPath(width):
 
         if currNode.x == endNode.x and currNode.y == endNode.y:
             print("FOUND: ",endNode.x,endNode.y)
-            while currNode is not None:
+            while currNode is not findNode(width,width):
+                prevNode = None
+                minG = 99999999999
+                minF = 99999999999
+                for x,y in currNode.neighbours:
+                    n = findNode(x,y)
+                    if n in closeSet or n in openSet:
+                        if n.g < minG:
+                            minG = n.g
+                            minF = n.f
+                            prevNode = n
+                        elif n.g == minG:
+                            if n.f < minF:
+                                minF = n.f
+                                minG = n.g
+                                prevNode = n
+
+            #while currNode is not None:
                 pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
                 pygame.display.update()   
-                currNode = currNode.parent
+                currNode = prevNode
+            #    currNode = currNode.parent
                 time.sleep(.05)
+            pygame.draw.rect(screen, GREEN, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+            pygame.display.update()   
+            time.sleep(.05)
 
             return
             
