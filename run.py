@@ -301,7 +301,45 @@ while running:
             running = False
         
         elif event.type == pygame.KEYDOWN:
-            pass
+            if event.key == pygame.K_w:
+                if (playerNode.x,playerNode.y-width) in grid:
+                    #Move up
+                    pygame.draw.rect(screen, WHITE, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
+
+                    playerNode.y -= width
+
+                    pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
+                    pygame.display.flip()
+
+            elif event.key == pygame.K_a:
+                if (playerNode.x-width,playerNode.y) in grid:
+                    #Move left
+                    pygame.draw.rect(screen, WHITE, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
+
+                    playerNode.x -= width
+
+                    pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
+                    pygame.display.flip()
+
+            elif event.key == pygame.K_s:
+                if (playerNode.x,playerNode.y+width) in grid:
+                    #Move down
+                    pygame.draw.rect(screen, WHITE, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
+
+                    playerNode.y += width
+
+                    pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
+                    pygame.display.flip()
+
+            elif event.key == pygame.K_d:
+                if (playerNode.x+width,playerNode.y) in grid:
+                    #Move right
+                    pygame.draw.rect(screen, WHITE, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
+
+                    playerNode.x += width
+
+                    pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
+                    pygame.display.flip()
         
         #Mouse click
         elif event.type == pygame.MOUSEBUTTONDOWN:
