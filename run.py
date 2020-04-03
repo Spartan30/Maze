@@ -7,6 +7,7 @@ import time
 import random
 import math
 from node import node
+from queue import Queue
 
 #Screen size
 screenWidth = 400
@@ -19,6 +20,7 @@ screen = pygame.display.set_mode([screenWidth, screenHeight])
 width = 25
 lineWidth = 0
 colour = 0
+chase = 0
 xTiles = int(screenWidth/width)
 yTiles = int(screenHeight/width)
 grid = []
@@ -123,6 +125,14 @@ def findNode(x,y):
         if n.x == x and n.y ==y:
             return n
 
+def clearParents():
+    for n in nodes:
+        n.parent = None
+
+def clearObstacles():
+    for n in nodes:
+        n.passable = 0
+
 #Find the path between start and end node
 #F total cost
 #G cost to start
@@ -134,6 +144,8 @@ def findPath(x,y,width,endNode):
     closeSet.clear()
     visited.clear()
     stack.clear()
+
+    clearParents()
 
     firstNode = findNode(x,y)
     firstNode.g = 0
@@ -181,11 +193,12 @@ def findPath(x,y,width,endNode):
         #Check if end has been reached
         if currNode.x == endNode.x and currNode.y == endNode.y:
             #Found end
-            print("FOUND: ",endNode.x,endNode.y)
+            #print("PATH FOUND: ",endNode.x,endNode.y)
             path = []
 
             #Keep looping until start is reached
             while currNode is not None:
+                #print("Back Track: ", currNode.x, currNode.y)
                 #Add node to path
                 path.append(currNode)
 
@@ -193,7 +206,7 @@ def findPath(x,y,width,endNode):
                 currNode = currNode.parent
 
             #Return the path in reverse
-            return path[::-1]
+            return path
             
 
         for x,y in currNode.neighbours:
@@ -291,19 +304,76 @@ pygame.draw.rect(screen, RED, (50,0,30,20),0)
 #Flip the display
 pygame.display.flip()
 
+
+def threader(eNode):
+    while True:
+        path = None
+        nextNode = None
+        scrapNode = None
+        global chase
+        global width
+        global playerNode
+
+        #setupNodes(width)
+
+        if eNode.x == playerNode.x and eNode.y == playerNode.y:
+            chase = 0
+
+        if chase == 0:
+            break
+
+        #print("Start Pathfinding")
+        #Find path
+        path = findPath(eNode.x, eNode.y, width, playerNode)
+
+        if path is not None:
+            #First node in list is current Node, throw it away
+            scrapNode = path.pop()
+
+            #Get next node
+            nextNode = path.pop()
+
+            if nextNode is not None:
+
+                pygame.draw.rect(screen, WHITE, (eNode.x+1, eNode.y+1, width-1, width-1), 0)
+                eNode.x = nextNode.x
+                eNode.y = nextNode.y
+                pygame.draw.rect(screen, RED, (eNode.x+1, eNode.y+1, width-1, width-1), 0)
+                pygame.display.flip()
+                #print(eNode.x, eNode.y)
+
+        time.sleep(.3)
+        #print("Wake up")
+
+    print("Thread Dead")
+
+
+def moveEnemy():
+    pass
+
+
+
 #Run until the user asks to quit
 running = True
 while running:
+
+
+    if chase == 1 and playerNode.x == enemyNode.x and playerNode.y == enemyNode.y:
+        chase = 0
+
     #Did the user click the window close button?
     for event in pygame.event.get():
         #Check event type
         if event.type == pygame.QUIT:
+            #Stop chasing
+            chase = 0
+
             #Quit game
             running = False
         
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
-                if (playerNode.x,playerNode.y-width) in grid:
+            if event.key == pygame.K_w and chase == 1:
+                if (playerNode.x,playerNode.y-width) in grid and findNode(playerNode.x, playerNode.y-width).passable == 0:
                     #Move up
                     pygame.draw.rect(screen, WHITE, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
 
@@ -312,8 +382,8 @@ while running:
                     pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
                     pygame.display.flip()
 
-            elif event.key == pygame.K_a:
-                if (playerNode.x-width,playerNode.y) in grid:
+            elif event.key == pygame.K_a and chase == 1:
+                if (playerNode.x-width,playerNode.y) in grid and findNode(playerNode.x-width, playerNode.y).passable == 0:
                     #Move left
                     pygame.draw.rect(screen, WHITE, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
 
@@ -322,8 +392,8 @@ while running:
                     pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
                     pygame.display.flip()
 
-            elif event.key == pygame.K_s:
-                if (playerNode.x,playerNode.y+width) in grid:
+            elif event.key == pygame.K_s and chase == 1:
+                if (playerNode.x,playerNode.y+width) in grid and findNode(playerNode.x, playerNode.y+width).passable == 0:
                     #Move down
                     pygame.draw.rect(screen, WHITE, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
 
@@ -332,8 +402,8 @@ while running:
                     pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
                     pygame.display.flip()
 
-            elif event.key == pygame.K_d:
-                if (playerNode.x+width,playerNode.y) in grid:
+            elif event.key == pygame.K_d and chase == 1:
+                if (playerNode.x+width,playerNode.y) in grid and findNode(playerNode.x+width, playerNode.y).passable == 0:
                     #Move right
                     pygame.draw.rect(screen, WHITE, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
 
@@ -352,7 +422,7 @@ while running:
                 clickNode = findNode(int(pos[0]/width)*width, int(pos[1]/width)*width)
 
                 #Check if a node was clicked
-                if clickNode is not None:
+                if clickNode is not None and chase == 0:
                     #Node was clicked
                     if clickNode.passable == 0:
                         #Node is passable, set to not passable
@@ -369,10 +439,13 @@ while running:
                     #Node was not clicked
                     if pos[0] > 0 and pos[0] < 30 and pos[1] > 0 and pos[1] < 20:
                         #Start button was clicked
-                        #Find path
-                        path = findPath(enemyNode.x, enemyNode.y, width, playerNode)
+                        chase = 1
+                        t = threading.Thread(target = threader, args=(enemyNode,))
+                        t.daemon = True
+                        t.start()
+                        
 
-                        if path is not None:
+                        #if path is not None:
 
                             #Draw path starting at beginning
                             #for p in path:
@@ -397,9 +470,17 @@ while running:
                     elif pos[0] > 50 and pos[0] < 80 and pos[1] > 0 and pos[1] < 20:
                         #Restart button was clicked
                         print("Restart")
-
+                        chase = 0
                         #Setup the grid
                         setupGrid(width)
+
+                        clearObstacles()
+
+                        playerNode.x = width
+                        playerNode.y = width
+
+                        enemyNode.x = screenWidth-(width*2)
+                        enemyNode.y = screenHeight-(width*2)
 
                         #Get all the nodes
                         #setupNodes(width)
