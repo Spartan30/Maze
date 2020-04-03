@@ -85,12 +85,16 @@ def setNode(x,y,width):
     newNode.y = y
     newNode.neighbours = []
     
+    newNode.g = 0
+    newNode.h = 0
+    newNode.f = 0
+
     #Calculate g and h
-    newNode.g = int(abs(x-startNode.x)/width) + int(abs(y-startNode.y)/width)
-    newNode.h = int(abs(x-endNode.x)/width)**2 + int(abs(y-endNode.y)/width)**2
+    #newNode.g = int(abs(x-startNode.x)/width) + int(abs(y-startNode.y)/width)
+    #newNode.h = int(abs(x-endNode.x)/width)**2 + int(abs(y-endNode.y)/width)**2
 
     #Calculate f
-    newNode.f = int(newNode.g + newNode.h)
+    #newNode.f = int(newNode.g + newNode.h)
 
     #Find neighbours
     if (x+width, y) in grid: #Check Right
@@ -198,6 +202,7 @@ def findPath(x,y,width):
                     #Path is shorter, change parent to currNode and update g and f
                     checkNode.parent = currNode
                     checkNode.g = currNode.g+1
+                    checkNode.h = int(abs(x-endNode.x)/width)**2 + int(abs(y-endNode.y)/width)**2
                     checkNode.f = checkNode.g + checkNode.h 
                 continue
             
@@ -217,12 +222,14 @@ def findPath(x,y,width):
                     #Check node is in openSet and new g value is less then or equal to current g value
                     #Update g and f value
                     checkNode.g = currNode.g + 1
+                    checkNode.h = int(abs(x-endNode.x)/width)**2 + int(abs(y-endNode.y)/width)**2
                     checkNode.f = checkNode.g + checkNode.h
                     checkNode.parent = currNode
                     continue
 
             #Node is not in openSet or closeSet, update g and f
             checkNode.g = currNode.g + 1
+            checkNode.h = int(abs(x-endNode.x)/width)**2 + int(abs(y-endNode.y)/width)**2
             checkNode.f = checkNode.g + checkNode.h
 
             #Draw openSet square
