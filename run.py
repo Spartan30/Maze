@@ -174,9 +174,9 @@ def findPath(x,y,width,endNode):
         closeSet.append(currNode)
 
         #Draw current square being checked
-        pygame.draw.rect(screen, PURPLE, (currNode.x+1, currNode.y+1, width-1, width-1),0)
-        pygame.display.update()   
-        time.sleep(.02)
+        #pygame.draw.rect(screen, PURPLE, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+        #pygame.display.update()   
+        #time.sleep(.02)
 
         #Check if end has been reached
         if currNode.x == endNode.x and currNode.y == endNode.y:
@@ -238,26 +238,26 @@ def findPath(x,y,width,endNode):
             checkNode.f = checkNode.g + checkNode.h
 
             #Draw openSet square
-            pygame.draw.rect(screen, BLUE, (checkNode.x+1, checkNode.y+1, width-1, width-1),0)
-            pygame.display.update()   
-            time.sleep(.02)
+            #pygame.draw.rect(screen, BLUE, (checkNode.x+1, checkNode.y+1, width-1, width-1),0)
+            #pygame.display.update()   
+            #time.sleep(.02)
 
             #Set nodes parent and add to openSet
             checkNode.parent = currNode
             openSet.append(checkNode)
 
         #Draw closeSet square
-        pygame.draw.rect(screen, YELLOW, (currNode.x+1, currNode.y+1, width-1, width-1),0)
-        pygame.display.update()   
-        time.sleep(.02)
+        #pygame.draw.rect(screen, YELLOW, (currNode.x+1, currNode.y+1, width-1, width-1),0)
+        #pygame.display.update()   
+        #time.sleep(.02)
 
     #No path found
     print("No Path Found!")
 
     #Set all closeSet square to red
-    for n in closeSet:
-        pygame.draw.rect(screen, RED, (n.x+1, n.y+1, width-1, width-1),0)
-        pygame.display.update()   
+    #for n in closeSet:
+        #pygame.draw.rect(screen, RED, (n.x+1, n.y+1, width-1, width-1),0)
+        #pygame.display.update()   
 
     #Return None
     return None
@@ -375,10 +375,10 @@ while running:
                         if path is not None:
 
                             #Draw path starting at beginning
-                            for p in path:
-                                pygame.draw.rect(screen, GREEN, (p.x+1, p.y+1, width-1, width-1),0)
-                                pygame.display.update()   
-                                time.sleep(.01)
+                            #for p in path:
+                            #    pygame.draw.rect(screen, GREEN, (p.x+1, p.y+1, width-1, width-1),0)
+                            #    pygame.display.update()   
+                            #    time.sleep(.01)
 
                         #Font
                         #default_font = pygame.font.get_default_font()
