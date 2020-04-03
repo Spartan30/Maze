@@ -2,14 +2,15 @@
 import pygame
 pygame.init()
 
+import threading
 import time
 import random
 import math
 from node import node
 
 #Screen size
-screenWidth = 600
-screenHeight = 600
+screenWidth = 400
+screenHeight = 400
 
 #Set up drawing window
 screen = pygame.display.set_mode([screenWidth, screenHeight])
@@ -380,13 +381,13 @@ while running:
                                 time.sleep(.01)
 
                         #Font
-                        default_font = pygame.font.get_default_font()
-                        font_renderer = pygame.font.Font(default_font, 12)
+                        #default_font = pygame.font.get_default_font()
+                        #font_renderer = pygame.font.Font(default_font, 12)
 
                         #Display f's
-                        for n in nodes:
-                            label = font_renderer.render(str(int(n.f)),1,(0,0,0))
-                            screen.blit(label,(n.x,n.y))
+                        #for n in nodes:
+                            #label = font_renderer.render(str(int(n.f)),1,(0,0,0))
+                            #screen.blit(label,(n.x,n.y))
                             #label = font_renderer.render(str(int(n.g)),1,(0,0,0))
                             #screen.blit(label,(n.x,n.y+13))
 
