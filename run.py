@@ -43,7 +43,6 @@ def setupGrid(width):
     screen.fill((255,255,255))
 
     grid.clear()
-    nodes.clear()
 
     for y in range(width, (screenHeight-width), width):
         for x in range(width, (screenWidth-width), width):
@@ -127,7 +126,7 @@ def findNode(x,y):
 #F total cost
 #G cost to start
 #H cost to end
-def findPath(x,y,width):
+def findPath(x,y,width,endNode):
 
     #Clear lists
     openSet.clear()
@@ -135,8 +134,13 @@ def findPath(x,y,width):
     visited.clear()
     stack.clear()
 
+    firstNode = findNode(x,y)
+    firstNode.g = 0
+    firstNode.h = 0
+    firstNode.f = 0
+
     #Add start node to openSet
-    openSet.append(findNode(x,y))
+    openSet.append(firstNode)
 
     #While openSet is not empty
     while len(openSet) > 0:
@@ -262,16 +266,16 @@ def findPath(x,y,width):
 setupGrid(width)
 
 #Set default start node
-startNode = createNode(width, width, width)
-startNode.f = 0
-startNode.g = 0
-pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)   
+enemyNode = createNode(screenWidth-width*2, screenHeight-width*2, width)
+enemyNode.f = 0
+enemyNode.g = 0
+pygame.draw.rect(screen, RED, (enemyNode.x+1, enemyNode.y+1, width-1, width-1),0)   
 
 #Set default end node
-endNode = createNode(screenWidth-width*2, screenHeight-width*2, width)
-endNode.f = 0
-endNode.h = 0
-pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
+playerNode = createNode(width, width, width)
+playerNode.f = 0
+playerNode.h = 0
+pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
 
 
 #Get all the nodes
@@ -297,54 +301,8 @@ while running:
             running = False
         
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_s:
-                #S key was pressed
-                #Get position of mouse
-                pos = pygame.mouse.get_pos()
-
-                #Find node that was clicked on
-                clickNode = findNode(int(pos[0]/width)*width, int(pos[1]/width)*width)
-
-                #Check if a node was clicked
-                if clickNode is not None:
-
-                    #Remove old start node
-                    pygame.draw.rect(screen, WHITE, (startNode.x+1, startNode.y+1, width-1, width-1),0)
-
-                    #Set start node
-                    startNode = createNode(clickNode.x, clickNode.y, width)
-                    startNode.f = 0
-                    startNode.g = 0
-                    pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)   
-                    pygame.display.flip()
-
-                    #Reset nodes
-                    setupNodes(width)
-
-            elif event.key == pygame.K_e:
-                #E key was pressed
-                #Get position of mouse
-                pos = pygame.mouse.get_pos()
-
-                #Find node that was clicked on
-                clickNode = findNode(int(pos[0]/width)*width, int(pos[1]/width)*width)
-
-                #Check if a node was clicked
-                if clickNode is not None:
-
-                    #Remove old end node
-                    pygame.draw.rect(screen, WHITE, (endNode.x+1, endNode.y+1, width-1, width-1),0)
-
-                    #Create new end node
-                    endNode = createNode(clickNode.x, clickNode.y, width)
-                    endNode.f = 0
-                    endNode.h = 0
-                    pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
-                    pygame.display.flip()
-
-                    #Reset nodes
-                    setupNodes(width)
-
+            pass
+        
         #Mouse click
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
@@ -373,7 +331,7 @@ while running:
                     if pos[0] > 0 and pos[0] < 30 and pos[1] > 0 and pos[1] < 20:
                         #Start button was clicked
                         #Find path
-                        path = findPath(startNode.x, startNode.y, width)
+                        path = findPath(enemyNode.x, enemyNode.y, width, playerNode)
 
                         if path is not None:
 
@@ -405,11 +363,11 @@ while running:
                         setupGrid(width)
 
                         #Get all the nodes
-                        setupNodes(width)
+                        #setupNodes(width)
 
-                        pygame.draw.rect(screen, GREEN, (startNode.x+1, startNode.y+1, width-1, width-1),0)
+                        pygame.draw.rect(screen, GREEN, (playerNode.x+1, playerNode.y+1, width-1, width-1),0)
 
-                        pygame.draw.rect(screen, RED, (endNode.x+1, endNode.y+1, width-1, width-1),0)
+                        pygame.draw.rect(screen, RED, (enemyNode.x+1, enemyNode.y+1, width-1, width-1),0)
 
 
                         #Draw start button
